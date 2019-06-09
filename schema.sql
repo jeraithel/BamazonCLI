@@ -5,7 +5,7 @@ CREATE DATABASE bamazon;
 USE bamazon;
 
 CREATE TABLE products (
-  id INT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT,
   product_name VARCHAR(100) NOT NULL,
   dept_name VARCHAR(100) NOT NULL,
   price DECIMAL(10,2) NOT NULL,
@@ -13,7 +13,7 @@ CREATE TABLE products (
   PRIMARY KEY (id)
 );
 
-INSERT INTO products (id, product_name, dept_name, price, stock) 
+INSERT INTO products (id, product_name, dept_name, price, stock)
 VALUES  (1, 'whiteboard', 'Office Equipment', 25, 4);
 
 INSERT INTO products (id, product_name, dept_name, price, stock) 

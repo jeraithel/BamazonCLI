@@ -58,34 +58,76 @@ function manageProducts() {
                         if (err) throw err;
                         var productArray = [];
                         for (var i = 0; res.length > i; i++) {
-                            productArray += res[i].product_name;
+                            productArray.push(res[i].product_name);
                         }
-                        console.log(productArray);
+                        // console.log(productArray);
                         inquirer
                             .prompt([
                                 {
-                                name: "productAdd",
-                                choices: ["1","2"],
-                                type: "list",
-                                message: "Which product would you like to add stock?"
+                                    name: "productAdd",
+                                    choices: productArray,
+                                    type: "list",
+                                    message: "Which product would you like to add stock?"
                                 },
                                 {
-                                name: "quantityAdd",
-                                type: "number",
-                                message: "How many would you like to add?"
+                                    name: "quantityAdd",
+                                    type: "number",
+                                    message: "How many would you like to add?"
                                 }
                             ])
                             .then(function (answer) {
-                                console.log(answer.productAdd);
-                                // connection.query("SELECT stock FROM products WHERE ?", { product_name: answer.productAdd }, function (err, res) {
-                                //     if (err) throw err;
-                                //     var currentStock = res;
-                                //     console.log(currentStock);
-                                // }
-                                // )
+                                // console.log(answer.productAdd);
+                                connection.query("SELECT stock FROM products WHERE ?", { product_name: answer.productAdd }, function (err, res) {
+                                    if (err) throw err;
+                                    var currentStock = res[0].stock;
+                                    // console.log(currentStock);
+                                    newStock = currentStock + answer.quantityAdd;
+                                    // console.log(newStock);
+                                    connection.query("UPDATE products SET ? WHERE ?", [{ stock: newStock }, { product_name: answer.productAdd }], function (err, res) {
+                                        if (err) throw err;
+                                        console.log("Added: " + answer.quantityAdd + " to inventory");
+                                        console.log("Total Quantity in Stock is Now: " + newStock);
+                                    });
+                                });
+
                             })
                     }
                     )
+                    break;
+                case "Add New Product":
+                    inquirer
+                        .prompt([
+                            {
+                                name: "productNew",
+                                type: "input",
+                                message: "Which product would you like to add?"
+                            },
+                            {
+                                name: "departmentNew",
+                                type: "input",
+                                message: "Which department is this product being added to?"
+                            },
+                            {
+                                name: "priceNew",
+                                type: "number",
+                                message: "What will be the customer price for this new product?"
+                            },
+                            {
+                                name: "quantityNew",
+                                type: "number",
+                                message: "How many initially added to stock?"
+                            }
+                        ])
+                        .then(function (answer) {
+                            console.log(answer.productNew);
+                            console.log(answer.departmentNew);
+                            console.log(answer.priceNew);
+                            console.log(answer.quantityNew);
+                            connection.query("INSERT INTO products (product_name, dept_name, price, stock) VALUES (?,?,?,?)", [answer.productNew, answer.departmentNew, answer.priceNew, answer.quantityNew], function (err, res) {
+                                if (err) throw err;
+                                console.log("New product " + answer.productNew + " added");
+                            });
+                        })
                     break;
             }
         })
